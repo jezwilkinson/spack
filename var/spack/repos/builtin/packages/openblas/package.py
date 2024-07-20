@@ -571,7 +571,9 @@ class MakefileBuilder(spack.build_systems.makefile.MakefileBuilder):
         # symbols. To make sure we get working Blas and Lapack, do a small
         # test.
         source_file = join_path(os.path.dirname(self.pkg.module.__file__), "test_cblas_dgemm.c")
-        blessed_file = join_path(os.path.dirname(self.pkg.module.__file__), "test_cblas_dgemm.output")
+        blessed_file = join_path(
+            os.path.dirname(self.pkg.module.__file__), "test_cblas_dgemm.output"
+        )
 
         include_flags = spec["openblas"].headers.cpp_flags
         link_flags = spec["openblas"].libs.ld_flags
