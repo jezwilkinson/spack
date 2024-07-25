@@ -39,6 +39,8 @@ class Libxcb(AutotoolsPackage, XorgPackage):
         description="Use the interpreter running spack to configure",
     )
 
+    depends_on("c", type="build")  # generated
+
     depends_on("libpthread-stubs")
     depends_on("libxau@0.99.2:")
     depends_on("libxdmcp")
