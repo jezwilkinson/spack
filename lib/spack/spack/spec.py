@@ -129,14 +129,15 @@ SPEC_FORMAT_RE = re.compile(
     r"|"  # or
     # OPTION 2: an actual format string
     r"{"  # non-escaped open brace {
-    r"([%@/]|arch=)?"  # optional sigil (to print sigil in color)
+    r"([%@/]|[\w ][\w -]*=)?"  # optional sigil (or identifier or space) to print sigil in color
     r"(?:\^([^}\.]+)\.)?"  # optional ^depname. (to get attr from dependency)
     # after the sigil or depname, we can have a hash expression or another attribute
     r"(?:"  # one of
     r"(hash\b)(?:\:(\d+))?"  # hash followed by :<optional length>
     r"|"  # or
-    r"([^}]*)"  # another attribute to format
+    r"([^?}]*)"  # another attribute to format
     r")"  # end one of
+    r"(\?)?"  # optional ? at end of format string
     r"(})?"  # finish format string with non-escaped close brace }, or missing if not present
     r"|"
     # OPTION 3: mismatched close brace (option 2 would consume a matched open brace)
@@ -163,14 +164,14 @@ HASH_COLOR = "@K"  #: color for highlighting package hashes
 DEFAULT_FORMAT = (
     "{name}{@versions}"
     "{%compiler.name}{@compiler.versions}{compiler_flags}"
-    "{variants}{arch=architecture}{/abstract_hash}"
+    "{variants} {arch=architecture}{/abstract_hash}"
 )
 
 #: Display format, which eliminates extra `@=` in the output, for readability.
 DISPLAY_FORMAT = (
     "{name}{@version}"
     "{%compiler.name}{@compiler.version}{compiler_flags}"
-    "{variants}{arch=architecture}{/abstract_hash}"
+    "{variants} {arch=architecture}{/abstract_hash}"
 )
 
 #: Regular expression to pull spec contents out of clearsigned signature
@@ -1894,14 +1895,14 @@ class Spec:
         """Returns a version of the spec with the dependencies hashed
         instead of completely enumerated."""
         spec_format = "{name}{@version}{%compiler.name}{@compiler.version}"
-        spec_format += "{variants}{arch=architecture}{/hash:7}"
+        spec_format += "{variants} {arch=architecture}{/hash:7}"
         return self.format(spec_format)
 
     @property
     def cshort_spec(self):
         """Returns an auto-colorized version of ``self.short_spec``."""
         spec_format = "{name}{@version}{%compiler.name}{@compiler.version}"
-        spec_format += "{variants}{arch=architecture}{/hash:7}"
+        spec_format += "{variants} {arch=architecture}{/hash:7}"
         return self.cformat(spec_format)
 
     @property
@@ -4420,14 +4421,12 @@ class Spec:
         ``s.format({^mpi.name})`` will print the name of the MPI
         implementation in the spec.
 
-        The ``@``, ``%``, ``arch=``, and ``/`` sigils
-        can be used to include the sigil with the printed
-        string. These sigils may only be used with the appropriate
-        attributes, listed below::
+        The ``@``, ``%``, and ``/`` sigils can be used to include the
+        sigil with the printed string. These sigils may only be used
+        with the appropriate attributes, listed below::
 
             @        ``{@version}``, ``{@compiler.version}``
             %        ``{%compiler}``, ``{%compiler.name}``
-            arch=    ``{arch=architecture}``
             /        ``{/hash}``, ``{/hash:7}``, etc
 
         The ``@`` sigil may also be used for any other property named
@@ -4435,14 +4434,35 @@ class Spec:
         printed if the attribute string is non-empty, and are colored
         according to the color of the attribute.
 
-        Sigils are not used for printing variants. Variants listed by
-        name naturally print with their sigil. For example,
-        ``spec.format('{variants.debug}')`` would print either
+        Variants listed by name naturally print with their sigil.
+        For example, ``spec.format('{variants.debug}')`` prints either
         ``+debug`` or ``~debug`` depending on the name of the
         variant. Non-boolean variants print as ``name=value``. To
         print variant names or values independently, use
         ``spec.format('{variants.<name>.name}')`` or
         ``spec.format('{variants.<name>.value}')``.
+
+        There are a few attributes on specs that can be specified as key-value
+        pairs but *not* variants, e.g.: ``os``, ``arch``, ``architecture``, ``target``,
+        ``namespace``, etc. You can format these with an optional ``key=`` prefix,
+        e.g. ``{namespace=namespace}`` or ``{arch=architecture}``, etc. The ``key=``
+        prefix will be colorized along with the value.
+
+        When formatting specs, it can be useful to print certain spec
+        attributes *only* if they are set. You can suffix *any* format string
+        as a ``?``, and the format string will evalute to ``""`` if the value
+        of the attribute to be printed is ``None``. So, you can write:
+
+            {namespace=namespace?}
+
+        And the entire format string will evaluate to ``""`` if ``spec.namespace``
+        is ``None``. If it is set to, e.g., ``"builtin"``, then this format will
+        print ``namespace=builtin``.
+
+        The key component of a key-value format *can* contain spaces, so you can
+        write, e.g., ``{ namespace=namespace?}`` to conditionally print a space *and*
+        ``namespace=<value>`` if ``<value>`` is set to something. Otherwise, the entire
+        format string evaluates to ``""`` and is not printed.
 
         Spec format strings use ``\`` as the escape character. Use
         ``\{`` and ``\}`` for literal braces, and ``\\`` for the
@@ -4451,6 +4471,7 @@ class Spec:
         Args:
             format_string: string containing the format to be expanded
             color: True for colorized result; False for no color; None for auto color.
+
         """
         ensure_modern_format_string(format_string)
 
@@ -4464,7 +4485,7 @@ class Spec:
             return clr.colorize(f"{color_fmt}{sigil}{clr.cescape(string)}@.", color=color)
 
         def format_attribute(match_object: Match) -> str:
-            (esc, sig, dep, hash, hash_len, attribute, close_brace, unmatched_close_brace) = (
+            (esc, sig, dep, hash, hash_len, attribute, q, close_brace, unmatched_close_brace) = (
                 match_object.groups()
             )
             if esc:
@@ -4504,10 +4525,6 @@ class Spec:
                 raise SpecFormatSigilError(sig, "compilers", attribute)
             elif sig == "/" and attribute != "abstract_hash":
                 raise SpecFormatSigilError(sig, "DAG hashes", attribute)
-            elif sig == "arch=":
-                if attribute not in ("architecture", "arch"):
-                    raise SpecFormatSigilError(sig, "the architecture", attribute)
-                sig = " arch="  # include space as separator
 
             # Iterate over components using getattr to get next element
             for idx, part in enumerate(parts):
@@ -4552,14 +4569,18 @@ class Spec:
 
             # Set color codes for various attributes
             color = None
-            if "variants" in parts:
-                color = VARIANT_COLOR
-            elif "architecture" in parts:
+            if "architecture" in parts:
                 color = ARCHITECTURE_COLOR
+            elif "variants" in parts or sig.endswith("="):
+                color = VARIANT_COLOR
             elif "compiler" in parts or "compiler_flags" in parts:
                 color = COMPILER_COLOR
             elif "version" in parts or "versions" in parts:
                 color = VERSION_COLOR
+
+            # return empty string if the format string ended with a ? and the value is None.
+            if q and current is None:
+                return ""
 
             # return colored output
             return safe_color(sig, str(current), color)
@@ -5523,7 +5544,7 @@ class UnconstrainableDependencySpecError(spack.error.SpecError):
 class AmbiguousHashError(spack.error.SpecError):
     def __init__(self, msg, *specs):
         spec_fmt = "{namespace}.{name}{@version}{%compiler}{compiler_flags}"
-        spec_fmt += "{variants}{arch=architecture}{/hash:7}"
+        spec_fmt += "{variants} {arch=architecture}{/hash:7}"
         specs_str = "\n  " + "\n  ".join(spec.format(spec_fmt) for spec in specs)
         super().__init__(msg + specs_str)
 
