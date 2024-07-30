@@ -24,7 +24,9 @@ class Geant3(CMakePackage):
     depends_on("cxx", type="build")  # generated
     depends_on("fortran", type="build")  # generated
 
-    depends_on("root~vmc")
+    depends_on("root")
+    depends_on("root~vmc", when =("^root@:6.25"))
+    
     depends_on("vmc")
 
     variant(
@@ -38,7 +40,7 @@ class Geant3(CMakePackage):
     def cmake_args(self):
         args = []
         if self.spec.satisfies("%gcc@10:"):
-            args.append('-DCMAKE_Fortran_FLAGS="-fallow-argument-mismatch -fallow-invalid-boz"')
+            args.append('-DCMAKE_Fortran_FLAGS="-std=legacy"')
         args.append(self.define_from_variant("CMAKE_CXX_STANDARD", "cxxstd"))
         return args
 
