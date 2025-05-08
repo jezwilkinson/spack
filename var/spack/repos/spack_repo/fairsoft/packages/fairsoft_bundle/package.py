@@ -52,10 +52,17 @@ class FairsoftBundle(BundlePackage):
     # next (master):
     depends_on('pythia8@8.310',          when='@master')
     # geant4 pinning breaks concretization
+<<<<<<< HEAD
     depends_on("root@6.32.06",          when='@master')
     depends_on('vmc@2-0',            when='@master')
     depends_on('geant3@4-4',            when='@master')   # 4.2_fairsoft is not in the core spack !! 
     depends_on('vgm@5-3',               when='@master')   # 5.2 is not in the core spack !!
+=======
+    depends_on("root@6.30.04",          when='@master')
+    depends_on('vmc@2-0',            when='@master')
+    depends_on('geant3@4-1',            when='@master')   # 4.2_fairsoft is not in the core spack !! 
+    depends_on('vgm@5-2',               when='@master')   # 5.2 is not in the core spack !!
+>>>>>>> 9411118b7d (add fairsoft repo for testing)
     depends_on('geant4-vmc@6-5',        when='@master')   # 6.5 is not in the core spack !!
     depends_on('fairsoft-config@develop', when='@master', type='run')
 
