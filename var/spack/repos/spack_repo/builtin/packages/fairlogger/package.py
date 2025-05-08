@@ -101,6 +101,7 @@ class Fairlogger(CMakePackage):
     )
     conflicts("+pretty", when="@:1.3")
 
+    depends_on("c", type="build")  # generated
     depends_on("cxx", type="build")  # generated
 
     depends_on("cmake@3.9.4:", type="build")

@@ -41,7 +41,7 @@ class Fairmq(CMakePackage):
     variant(
         "cxxstd",
         default="default",
-        values=("default", "17", "20"),
+        values=("default", "11", "14", "17", "20"),
         multi=False,
         description="Use the specified C++ standard when building.",
     )
