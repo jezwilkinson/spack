@@ -56,7 +56,7 @@ class Fairmq(CMakePackage):
         depends_on("faircmakemodules")
         depends_on("git")
 
-    depends_on("boost@1.66: +container+program_options+filesystem+date_time+regex")
+    depends_on("boost@1.66:1.84 +container+program_options+filesystem+date_time+regex")
     depends_on("fairlogger@1.6: +pretty")
     depends_on("libzmq@4.1.4:")
 
