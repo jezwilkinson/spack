@@ -61,6 +61,7 @@ class Fairlogger(CMakePackage):
         "pretty", default=False, description="Use BOOST_PRETTY_FUNCTION macro (Supported by 1.4+)."
     )
 
+    depends_on("c", type="build")  # generated
     depends_on("cxx", type="build")  # generated
 
     depends_on("cmake@3.9.4:", type="build")
