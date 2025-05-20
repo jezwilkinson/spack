@@ -4,7 +4,9 @@
 #   Darmstadt, Germany
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+from spack_repo.builtin.build_systems.cmake import CMakePackage
 from spack.package import *
+
 
 class Pandaroot(CMakePackage):
     """Simulations and Data Analysis for Panda"""
