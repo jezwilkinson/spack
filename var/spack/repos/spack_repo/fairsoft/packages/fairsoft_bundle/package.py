@@ -16,7 +16,7 @@ class FairsoftBundle(BundlePackage):
     # To get only the flags, but no version pinnings:
     # For the next release (would love to call it "next", but that is
     # not sorted correctly by spack)
-    version('may25-rc')
+    version('may25')
     version('master')
     # Releases:
 
