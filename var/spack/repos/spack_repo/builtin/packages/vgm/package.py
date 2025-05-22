@@ -22,6 +22,7 @@ class Vgm(CMakePackage):
     license("GPL-3.0-or-later")
 
     version("master", branch="master")
+    version("5-3-1", sha256="485903ad98ae0032d4acfd73934bf46d8fb665146b664a40b6f7cfd9f73386a6")
     version("5-3", sha256="fe46cb40e498f6f51eb8e9c7092b3eba0a17d6431fb2ed488063131e94758766")
     version("5-2", sha256="0abdef5484b5b9cc845337bc434636ca8691b129b04c7f64350047fe7f6bbc94")
     version("5-0", sha256="ab929df1aa9b0cda40451f5a98982c3328901865b33e30207ee9b9fe14331344")

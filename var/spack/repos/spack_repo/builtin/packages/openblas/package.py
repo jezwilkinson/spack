@@ -549,7 +549,7 @@ class MakefileBuilder(makefile.MakefileBuilder):
 
     @property
     def build_targets(self):
-        return ["-s"] + self.make_defs + ["all"]
+        return ["-s"] + self.make_defs + ["shared"]
 
     @run_after("build")
     @on_package_attributes(run_tests=True)
