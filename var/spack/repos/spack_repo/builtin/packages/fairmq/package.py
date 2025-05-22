@@ -58,7 +58,7 @@ class Fairmq(CMakePackage):
         depends_on("git")
 
     depends_on("boost@1.66: +container+program_options+filesystem+date_time+regex")
-    depends_on("boost@:1.84")
+    conflicts("^boost@1.88:")
     depends_on("fairlogger@1.6: +pretty")
     depends_on("libzmq@4.1.4:")
 
