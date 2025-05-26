@@ -37,7 +37,7 @@ class Root(CMakePackage):
     version("develop", branch="master")
 
     # Release candidate
-    version("6.36.00-rc1", sha256="5a407620fe0164cbf6c9f26b1ae882a17c10151472d7268fbad176027564b1c0")
+    version("6.36.00", sha256="94afc8def92842679a130a27521be66e2abdaa37620888e61d828a43fc4b01a2")
 
     # Production version
     version("6.34.08", sha256="806045b156de03fe8f5661a670eab877f2e4d2da6c234dc3e31e98e2d7d96fe8")
