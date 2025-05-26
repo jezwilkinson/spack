@@ -51,7 +51,7 @@ class FairsoftBundle(BundlePackage):
     depends_on('root +aqua', when='+graphics')
 
     depends_on('pythia8@8.313', when='@may25')
-    depends_on('root@6.36.00-rc1', when='@may25')
+    depends_on('root@6.36.00', when='@may25')
     depends_on('vmc@2-1', when='@may25')
     depends_on('geant3@4-4', when='@may25')
     depends_on('vgm@5-3-1', when='@may25')
