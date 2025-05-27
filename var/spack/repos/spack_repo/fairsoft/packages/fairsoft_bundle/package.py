@@ -32,7 +32,7 @@ class FairsoftBundle(BundlePackage):
     depends_on('geant4 ~qt~vecgeom~opengl~x11~motif')
 
     # ensure that OpenBLAS uses CMake build system (default Makefile causes issues on some x86 Macs due to tests)
-    depends_on('openblas build_system=cmake')
+    depends_on('openblas build_system=cmake ~dynamic_dispatch')
     
     # Generic ROOT dependencies
     depends_on('root +fortran+pythia8+vc~vdt')
