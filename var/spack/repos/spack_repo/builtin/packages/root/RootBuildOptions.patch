@@ -1,0 +1,25 @@
+--- a/cmake/modules/RootBuildOptions.cmake
++++ b/cmake/modules/RootBuildOptions.cmake
+@@ -429,16 +429,19 @@
+ 
+ if(rpath)
+   file(RELATIVE_PATH BINDIR_TO_LIBDIR "${CMAKE_INSTALL_FULL_BINDIR}" "${CMAKE_INSTALL_FULL_LIBDIR}")
+-
++  set(CMAKE_SKIP_RPATH FALSE)
++  set(CMAKE_SKIP_INSTALL_RPATH FALSE)
+   if(APPLE)
+     set(CMAKE_MACOSX_RPATH TRUE)
+     set(CMAKE_INSTALL_NAME_DIR "@rpath")
+-    list(APPEND CMAKE_INSTALL_RPATH @loader_path @loader_path/${BINDIR_TO_LIBDIR})
++    set(CMAKE_INSTALL_RPATH "@loader_path/${BINDIR_TO_LIBDIR}")
+   else()
+-    list(APPEND CMAKE_INSTALL_RPATH $ORIGIN $ORIGIN/${BINDIR_TO_LIBDIR})
++    set(CMAKE_INSTALL_RPATH "$ORIGIN;$ORIGIN/${BINDIR_TO_LIBDIR}")
+   endif()
+ 
+   unset(BINDIR_TO_LIBDIR)
++else()
++  set(CMAKE_SKIP_INSTALL_RPATH TRUE)
+ endif()
+ 
+ #---deal with the DCMAKE_IGNORE_PATH------------------------------------------------------------
