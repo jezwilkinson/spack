@@ -189,6 +189,8 @@ class Root(CMakePackage):
             sha256="1937290a4d54cd2e3e8a8d23d93b8dedaca9ed8dcfdcfa2f0d16629ff53fb3b7",
             when="@6.28:6.32 +python",
         )
+        # fix rpath handling for ROOT libraries
+        patch("RootBuildOptions.patch", when="@6.36.00")
 
     # ###################### Variants ##########################
     # See README.md for specific notes about what ROOT configuration
